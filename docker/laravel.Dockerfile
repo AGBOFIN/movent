@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends git unzip curl 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/app
 ENV COMPOSER_ALLOW_SUPERUSER=1
+# Composer 2.9+ bloque les paquets avec advisory de sécurité ; Laravel 11 est
+# flagué sur toute sa branche. Le blocage est désactivé le temps du build.
+ENV COMPOSER_NO_BLOCKING=1
 RUN composer create-project laravel/laravel:^11.0 . --no-scripts --no-interaction --prefer-dist \
  && cp .env.example .env \
  && rm -f app/Models/User.php database/migrations/*.php database/factories/*.php database/seeders/*.php \
