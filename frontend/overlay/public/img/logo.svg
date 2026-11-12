@@ -1,0 +1,8 @@
+<svg viewBox="0 0 168 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MOVENT">
+<g transform="translate(0,4) scale(1)">
+<path d="M6 2h36a4 4 0 0 1 4 4v5a5 5 0 0 0 0 10v5a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-5a5 5 0 0 0 0-10V6a4 4 0 0 1 4-4Z" fill="#16A34A"/>
+<path d="M32 5v22" stroke="#0F172A" stroke-width="2" stroke-dasharray="2.5 2.5"/>
+<path d="M10 22V10l6 8 6-8v12" stroke="#0F172A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="58" y="27" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="21" letter-spacing="4" fill="#F8FAFC">MOVENT</text>
+</svg>

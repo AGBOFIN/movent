@@ -11,7 +11,7 @@
   <label>Je suis
     <select name="role"><option value="PARTICIPANT">Participant (je réserve)</option><option value="ORGANIZER">Organisateur (je publie des événements)</option></select>
   </label>
-  <button class="btn gold block">Créer mon compte</button>
+  <button class="btn block">Créer mon compte</button>
   <p class="muted center">Déjà inscrit ? <a href="/login">Se connecter</a></p>
 </form>
 @endsection

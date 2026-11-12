@@ -41,7 +41,8 @@ Quatre rôles : `PARTICIPANT`, `ORGANIZER`, `ADMIN` (exploitation) et **`NATIONA
 ### 2.3 Isolation des données : UUID inter-services, FK intra-base uniquement
 
 - Chaque service a sa base ; **aucune clé étrangère ne traverse les bases**. `events.organizer_id`, `holds.booking_id`, `bookings.participant_id/event_id/organizer_id` sont des UUID sans contrainte.
-- Les FK PostgreSQL n'existent qu'à l'intérieur d'une base : `events.category_id → categories`, `holds.event_id → events`, `payments.booking_id`, `tickets.booking_id`.
+- Les FK PostgreSQL n'existent qu'à l'intérieur d'une base : `events.category_id → categories`, `holds.event_id → events`, `payments.booking_id`, `tickets.booking_id`, **`events.venue_id → venues`** (relation interne à la base event-service).
+- **Table `venues`** (même base que `events`) : lieux réels d'événements au Togo (hôtels, palais des congrès, stades, centres culturels) avec nom, type, ville, adresse, description, capacité publique, équipements, site officiel, photo et crédit d'image. Exposée publiquement en lecture via `/api/venues` ; chaque événement seedé est rattaché à un lieu, et le catalogue filtre par `venue_id` et `city`.
 - **Dénormalisation assumée** dans `bookings` : `participant_name`, `event_title`, `event_start_at`, `event_location`, `organizer_id` sont des instantanés au moment de la réservation. Ils évitent des appels inter-services à chaque affichage et figent l'historique si l'événement change. C'est la contrepartie logique de l'absence de FK : l'intégrité est assurée par les API, pas par la base.
 
 ### 2.4 Anti-surréservation : hold atomique dans PostgreSQL
@@ -93,7 +94,7 @@ Règles de routage (identiques dans les deux passerelles) :
 | Préfixe | Destination |
 |---|---|
 | `/api/auth`, `/api/me`, `/api/users` | user-service |
-| `/api/events`, `/api/my-events`, `/api/categories`, `/api/event-stats`, `/api/admin/events` | event-service |
+| `/api/events`, `/api/my-events`, `/api/categories`, `/api/event-stats`, `/api/admin/events`, `/api/venues` | event-service |
 | `/api/bookings`, `/api/tickets`, `/api/organizer`, `/api/booking-stats` | booking-service |
 | `/api/events/{id}/hold|confirm-hold|release-hold` | **403** (interne) |
 | `/api/*` inconnu | 404 JSON |

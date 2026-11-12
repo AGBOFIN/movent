@@ -136,4 +136,22 @@ class BookingFlowTest extends TestCase
     {
         $this->postJson('/api/bookings', ['event_id' => $this->eid, 'quantity' => 1])->assertStatus(401);
     }
+
+    public function test_l_autorite_nationale_ne_peut_pas_ecrire(): void
+    {
+        $auth = $this->auth(['sub' => (string) Str::uuid(), 'role' => 'NATIONAL_AUTHORITY', 'name' => 'Autorité']);
+        $this->postJson('/api/bookings', ['event_id' => $this->eid, 'quantity' => 1], $auth)->assertStatus(403);
+        // mais la lecture reste autorisée
+        $this->getJson('/api/bookings', $auth)->assertOk();
+    }
+
+    public function test_un_participant_ne_peut_pas_payer_la_reservation_d_un_autre(): void
+    {
+        $this->fakeEventService($this->eventJson(5000));
+        $owner = $this->auth(['sub' => (string) Str::uuid(), 'role' => 'PARTICIPANT', 'name' => 'A']);
+        $other = $this->auth(['sub' => (string) Str::uuid(), 'role' => 'PARTICIPANT', 'name' => 'B']);
+        $bid = $this->postJson('/api/bookings', ['event_id' => $this->eid, 'quantity' => 1], $owner)->json('id');
+        $this->postJson("/api/bookings/{$bid}/pay", ['outcome' => 'success'], $other)->assertStatus(404);
+        $this->getJson("/api/bookings/{$bid}", $other)->assertStatus(404);
+    }
 }

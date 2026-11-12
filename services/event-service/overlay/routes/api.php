@@ -2,12 +2,16 @@
 
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HoldController;
+use App\Http\Controllers\VenueController;
 use Illuminate\Support\Facades\Route;
 
 // Public
 Route::get('categories', [EventController::class, 'categories']);
 Route::get('events', [EventController::class, 'index']);
 Route::get('events/{id}', [EventController::class, 'show'])->whereUuid('id');
+Route::get('venues', [VenueController::class, 'index']);
+Route::get('venues/cities', [VenueController::class, 'cities']);
+Route::get('venues/{slug}', [VenueController::class, 'show'])->where('slug', '[a-z0-9-]+');
 
 // Organisateur / Admin
 Route::middleware(['jwt', 'role:ORGANIZER,ADMIN'])->group(function () {
