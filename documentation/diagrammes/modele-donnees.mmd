@@ -1,0 +1,90 @@
+erDiagram
+  movent_users ||--o{ users : ""
+
+  movent_events ||--o{ categories : ""
+  movent_events ||--o{ events : ""
+  movent_events ||--o{ holds : ""
+  categories ||--o{ events : "category_id (FK interne)"
+  events ||--o{ holds : "event_id (FK interne)"
+
+  movent_bookings ||--o{ bookings : ""
+  movent_bookings ||--o{ payments : ""
+  movent_bookings ||--o{ tickets : ""
+  bookings ||--o{ payments : "booking_id (FK interne)"
+  bookings ||--o{ tickets : "booking_id (FK interne)"
+
+  users {
+    uuid id PK
+    string first_name
+    string last_name
+    string email UK
+    string password
+    string phone
+    string role "ADMIN|ORGANIZER|PARTICIPANT"
+    bool is_active
+  }
+
+  categories {
+    uuid id PK
+    string name UK
+    text description
+  }
+
+  events {
+    uuid id PK
+    uuid organizer_id "réf. externe User (UUID, pas de FK)"
+    uuid category_id FK
+    string title
+    text description
+    string image
+    string location
+    timestamp start_at
+    timestamp end_at
+    int capacity
+    int available_places
+    decimal price "NUMERIC(12,2)"
+    string status "DRAFT|PENDING|APPROVED|REJECTED|CANCELLED"
+    text rejection_reason
+  }
+
+  holds {
+    uuid id PK
+    uuid event_id FK
+    uuid booking_id UK "réf. externe Booking"
+    int quantity
+    string status "HELD|CONFIRMED|RELEASED|EXPIRED"
+    timestamp expires_at
+  }
+
+  bookings {
+    uuid id PK
+    uuid participant_id "réf. externe User"
+    uuid event_id "réf. externe Event"
+    uuid organizer_id "snapshot organisateur"
+    string participant_name "snapshot"
+    string event_title "snapshot"
+    timestamp event_start_at "snapshot"
+    string event_location "snapshot"
+    string reference UK
+    int quantity
+    decimal unit_price "NUMERIC(12,2)"
+    decimal total_amount "NUMERIC(12,2)"
+    string status "PENDING|CONFIRMED|FAILED|CANCELLED|EXPIRED"
+  }
+
+  payments {
+    uuid id PK
+    uuid booking_id FK
+    decimal amount "NUMERIC(12,2)"
+    string method "SIMULATED"
+    string status "PENDING|SUCCESS|FAILED"
+    string transaction_reference UK
+  }
+
+  tickets {
+    uuid id PK
+    uuid booking_id FK
+    string ticket_reference UK
+    string qr_token UK
+    string status "VALID|CANCELLED|USED"
+  }

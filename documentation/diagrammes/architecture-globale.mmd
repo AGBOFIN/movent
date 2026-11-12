@@ -1,0 +1,38 @@
+flowchart LR
+  subgraph Internet
+    U([Navigateur])
+  end
+
+  subgraph Hote["Hôte / VM (Docker Compose)"]
+    direction TB
+    GW["Passerelle :<br/>Nginx (local) / Caddy+HTTPS (prod)"]
+
+    subgraph Apps["Applications Laravel 11 (PHP 8.3, php artisan serve)"]
+      FE["movent-frontend<br/>Blade + JS"]
+      US["movent-user-service"]
+      ES["movent-event-service"]
+      BS["movent-booking-service"]
+    end
+
+    subgraph DBs["PostgreSQL 16"]
+      DBU[("movent_users")]
+      DBE[("movent_events")]
+      DBB[("movent_bookings")]
+    end
+  end
+
+  U -->|"HTTPS (prod) / HTTP :8080 (local)"| GW
+  GW -->|"pages + assets"| FE
+  GW -->|"/api/auth · /api/me · /api/users"| US
+  GW -->|"/api/events · /api/my-events · /api/categories · /api/admin"| ES
+  GW -->|"/api/bookings · /api/tickets · /api/organizer"| BS
+  GW -.->|"403 : hold/confirm-hold/release-hold"| X((bloqué))
+
+  US --> DBU
+  ES --> DBE
+  BS --> DBB
+  BS -->|"GET /api/events/{id} (public)"| ES
+  BS -->|"POST hold / confirm-hold / release-hold<br/>+ X-Internal-Key"| ES
+
+  classDef db fill:#1c1236,stroke:#d6ae69,color:#fff
+  class DBU,DBE,DBB db

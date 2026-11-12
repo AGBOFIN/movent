@@ -1,0 +1,40 @@
+sequenceDiagram
+  autonumber
+  actor O as Organisateur
+  actor A as Administrateur
+  participant F as Frontend
+  participant G as Gateway
+  participant E as Event Service
+  participant DE as movent_events
+
+  O->>F: Remplit le formulaire événement
+  F->>G: POST /api/events (JWT ORGANIZER)
+  G->>E: POST /api/events
+  E->>E: jwt + role:ORGANIZER,ADMIN ; validation
+  E->>DE: INSERT events (status=DRAFT, available=capacity)
+  E-->>F: 201 DRAFT
+  Note over O,A: invisible dans le catalogue public
+
+  O->>F: « Soumettre »
+  F->>E: POST /api/events/{id}/submit
+  E->>DE: status DRAFT|REJECTED → PENDING, rejection_reason=NULL
+  E-->>F: 200 PENDING
+
+  A->>F: GET /api/admin/events?status=PENDING
+  F->>E: GET /api/admin/events (JWT ADMIN)
+  E->>DE: SELECT … WHERE status=PENDING
+  E-->>A: liste des demandes
+
+  alt Validation
+    A->>F: « Valider »
+    F->>E: POST /api/events/{id}/approve
+    E->>DE: status=PENDING → APPROVED
+    E-->>F: 200 APPROVED → visible au catalogue
+  else Rejet
+    A->>F: « Rejeter » + motif
+    F->>E: POST /api/events/{id}/reject {reason}
+    E->>DE: status=REJECTED, rejection_reason=motif
+    E-->>F: 200 REJECTED
+    O->>F: Voit le motif, corrige, resoumet
+    F->>E: PUT /api/events/{id} puis POST …/submit
+  end

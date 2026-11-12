@@ -1,0 +1,48 @@
+sequenceDiagram
+  autonumber
+  actor P as Participant
+  participant F as Frontend (Blade/JS)
+  participant G as Gateway Nginx
+  participant K as Booking Service
+  participant E as Event Service
+  participant DK as movent_bookings
+  participant DE as movent_events
+
+  P->>F: Choisit événement + quantité
+  F->>G: POST /api/bookings (Bearer JWT)
+  G->>K: POST /api/bookings
+  K->>K: jwt → auth{id, role}
+  K->>E: GET /api/events/{id} (snapshot prix/dates/lieu)
+  E-->>K: 200 (APPROVED) ou 404
+  K->>E: POST /api/events/{id}/hold<br/>{booking_id, quantity} + X-Internal-Key
+  E->>DE: BEGIN ; expireStale() ; SELECT … FOR UPDATE
+  alt places insuffisantes
+    E-->>K: 409
+    K-->>F: 409 « Places insuffisantes »
+  else places disponibles
+    E->>DE: available_places -= qty ; INSERT holds (HELD, +10 min)
+    E-->>K: 201 hold
+    K->>DK: INSERT bookings (PENDING)
+    alt prix = 0 (gratuit)
+      K->>E: POST confirm-hold
+      E->>DE: holds.status = CONFIRMED
+      K->>DK: status CONFIRMED + tickets (QR uniques)
+      K-->>F: 201 CONFIRMED
+    else payant
+      K-->>F: 201 PENDING
+      P->>F: Paiement simulé : succès ou échec
+      alt succès
+        F->>K: POST /api/bookings/{id}/pay {outcome: success}
+        K->>E: POST confirm-hold
+        E->>DE: holds.status = CONFIRMED
+        K->>DK: BEGIN ; payment SUCCESS ; booking CONFIRMED ; N tickets
+        K-->>F: 200 CONFIRMED
+      else échec
+        F->>K: POST /api/bookings/{id}/pay {outcome: failed}
+        K->>E: POST release-hold
+        E->>DE: available_places += qty ; holds RELEASED
+        K->>DK: BEGIN ; payment FAILED ; booking FAILED
+        K-->>F: 200 FAILED
+      end
+    end
+  end

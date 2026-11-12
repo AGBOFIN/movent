@@ -1,0 +1,167 @@
+# MOVENT — Production (VM unique, 2 vCPU / 4 Go RAM conseillés).
+# Usage : cp .env.example .env  →  remplir .env  →  docker compose -f docker-compose.prod.yml up -d --build
+# Seuls les ports 80/443 sont exposés (Caddy = reverse proxy + HTTPS automatique).
+x-laravel-env: &laravel-env
+  APP_ENV: production
+  APP_DEBUG: "false"
+  APP_KEY: ${APP_KEY:-}
+  LOG_CHANNEL: stderr
+  CACHE_STORE: file
+  SESSION_DRIVER: file
+  QUEUE_CONNECTION: sync
+  JWT_SECRET: ${JWT_SECRET:?JWT_SECRET manquant dans .env}
+  INTERNAL_API_KEY: ${INTERNAL_API_KEY:?INTERNAL_API_KEY manquant dans .env}
+  PHP_CLI_SERVER_WORKERS: "4"
+
+services:
+  user-db:
+    image: postgres:16
+    container_name: movent-db-users
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: movent_users
+      POSTGRES_USER: movent
+      POSTGRES_PASSWORD: ${USERS_DB_PASSWORD:?manquant}
+    volumes: [users_data:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U movent -d movent_users"], interval: 5s, timeout: 3s, retries: 20 }
+    networks: [movent-network]
+
+  event-db:
+    image: postgres:16
+    container_name: movent-db-events
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: movent_events
+      POSTGRES_USER: movent
+      POSTGRES_PASSWORD: ${EVENTS_DB_PASSWORD:?manquant}
+    volumes: [events_data:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U movent -d movent_events"], interval: 5s, timeout: 3s, retries: 20 }
+    networks: [movent-network]
+
+  booking-db:
+    image: postgres:16
+    container_name: movent-db-bookings
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: movent_bookings
+      POSTGRES_USER: movent
+      POSTGRES_PASSWORD: ${BOOKINGS_DB_PASSWORD:?manquant}
+    volumes: [bookings_data:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U movent -d movent_bookings"], interval: 5s, timeout: 3s, retries: 20 }
+    networks: [movent-network]
+
+  user-service:
+    build: { context: ., dockerfile: docker/laravel.Dockerfile, args: { SERVICE_DIR: services/user-service, WITH_DEV: "0" } }
+    container_name: movent-user-service
+    restart: unless-stopped
+    depends_on: { user-db: { condition: service_healthy } }
+    environment:
+      <<: *laravel-env
+      DB_CONNECTION: pgsql
+      DB_HOST: user-db
+      DB_PORT: 5432
+      DB_DATABASE: movent_users
+      DB_USERNAME: movent
+      DB_PASSWORD: ${USERS_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);\""]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    networks: [movent-network]
+
+  event-service:
+    build: { context: ., dockerfile: docker/laravel.Dockerfile, args: { SERVICE_DIR: services/event-service, WITH_DEV: "0" } }
+    container_name: movent-event-service
+    restart: unless-stopped
+    depends_on: { event-db: { condition: service_healthy } }
+    environment:
+      <<: *laravel-env
+      DB_CONNECTION: pgsql
+      DB_HOST: event-db
+      DB_PORT: 5432
+      DB_DATABASE: movent_events
+      DB_USERNAME: movent
+      DB_PASSWORD: ${EVENTS_DB_PASSWORD}
+      HOLD_MINUTES: ${HOLD_MINUTES:-10}
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);\""]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    networks: [movent-network]
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: docker/laravel.Dockerfile
+      args:
+        SERVICE_DIR: services/booking-service
+        EXTRA_PACKAGES: "barryvdh/laravel-dompdf:^3.0 endroid/qr-code:^5.0"
+        WITH_DEV: "0"
+    container_name: movent-booking-service
+    restart: unless-stopped
+    depends_on:
+      booking-db: { condition: service_healthy }
+      event-service: { condition: service_started }
+    environment:
+      <<: *laravel-env
+      DB_CONNECTION: pgsql
+      DB_HOST: booking-db
+      DB_PORT: 5432
+      DB_DATABASE: movent_bookings
+      DB_USERNAME: movent
+      DB_PASSWORD: ${BOOKINGS_DB_PASSWORD}
+      EVENT_SERVICE_URL: http://event-service:8000
+      HOLD_MINUTES: ${HOLD_MINUTES:-10}
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);\""]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    networks: [movent-network]
+
+  frontend:
+    build: { context: ., dockerfile: docker/laravel.Dockerfile, args: { SERVICE_DIR: frontend, WITH_DEV: "0" } }
+    container_name: movent-frontend
+    restart: unless-stopped
+    environment:
+      <<: *laravel-env
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);\""]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    networks: [movent-network]
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: movent-caddy
+    restart: unless-stopped
+    depends_on: [frontend, user-service, event-service, booking-service]
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN manquant dans .env (nom de domaine ou adresse IP)}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [movent-network]
+
+volumes:
+  users_data:
+  events_data:
+  bookings_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  movent-network:
+    driver: bridge

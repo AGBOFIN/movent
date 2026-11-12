@@ -1,0 +1,72 @@
+# MOVENT — Passerelle HTTPS (production).
+# Remplace le gateway Nginx du docker-compose local : Caddy fait le reverse proxy
+# ET obtient le certificat TLS automatiquement (Let's Encrypt) dès que DOMAIN
+# est un nom de domaine. Si DOMAIN est une adresse IP, Caddy sert en HTTP :80.
+{
+	# Décommentez pour recevoir les alertes d'expiration des certificats :
+	# email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Routes internes Booking -> Event : jamais exposées (double protection :
+	# ce bloc + le middleware InternalKey côté event-service).
+	@internal path_regexp internal ^/api/events/[^/]+/(hold|confirm-hold|release-hold)$
+	handle @internal {
+		respond "Forbidden" 403
+	}
+
+	# User Service
+	handle /api/auth/* {
+		reverse_proxy user-service:8000
+	}
+	handle /api/me {
+		reverse_proxy user-service:8000
+	}
+	handle /api/users* {
+		reverse_proxy user-service:8000
+	}
+
+	# Event Service
+	handle /api/categories* {
+		reverse_proxy event-service:8000
+	}
+	handle /api/event-stats {
+		reverse_proxy event-service:8000
+	}
+	handle /api/admin/* {
+		reverse_proxy event-service:8000
+	}
+	handle /api/my-events* {
+		reverse_proxy event-service:8000
+	}
+	handle /api/events* {
+		reverse_proxy event-service:8000
+	}
+
+	# Booking Service
+	handle /api/organizer/* {
+		reverse_proxy booking-service:8000
+	}
+	handle /api/booking-stats {
+		reverse_proxy booking-service:8000
+	}
+	handle /api/bookings* {
+		reverse_proxy booking-service:8000
+	}
+	handle /api/tickets* {
+		reverse_proxy booking-service:8000
+	}
+
+	# Toute autre route /api/* est inconnue
+	handle /api/* {
+		header Content-Type application/json
+		respond `{"message":"Route inconnue."}` 404
+	}
+
+	# Le reste : frontend Laravel (pages Blade)
+	handle {
+		reverse_proxy frontend:8000
+	}
+}
