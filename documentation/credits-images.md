@@ -13,7 +13,7 @@ Toutes les photos proviennent de **Wikimedia Commons** (licences libres). Elles 
 | `img/lieux/onomo-hotel-lome.jpg` | ONOMO Lome- Reception Lobby.jpg | ONOMO Hotels | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:ONOMO_Lome-_Reception_Lobby.jpg |
 | `img/lieux/palais-des-congres-lome.jpg` | Palais des congrès de Lomé.jpg | Lome2023 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Palais_des_congrès_de_Lomé.jpg |
 | `img/lieux/palais-de-lome.jpg` | PALAIS DE LOMÉ.jpg | Ak9visuelmind | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:PALAIS_DE_LOMÉ.jpg |
-| `img/lieux/stade-de-kegue.jpg` | Football practice outside the National Stadium, Accra, Ghana.jpg | Ed Suter | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Football_practice_outside_the_National_Stadium,_Accra,_Ghana.jpg |
+| `img/lieux/stade-de-kegue.svg` | Visuel neutre généré (aucune photo libre du stade de Kégué trouvée) | — | Projet MOVENT | — |
 | `img/lieux/institut-francais-lome.jpg` | Institut français du Togo.jpg | AKE Amazan | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Institut_français_du_Togo.jpg |
 | `img/lieux/palais-des-congres-kara.jpg` | Palais des congrès de kara (12527).jpg | Hermannkass | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Palais_des_congrès_de_kara_(12527).jpg |
 | `img/lieux/stade-municipal-kara.jpg` | Stade asko (5).jpg | Theolebaron | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Stade_asko_(5).jpg |
@@ -36,7 +36,7 @@ Toutes les photos proviennent de **Wikimedia Commons** (licences libres). Elles 
 
 ## Remarques
 
-- `stade-de-kegue.jpg` est une **image de substitution** (stade générique, Accra, Ghana — Ed Suter, CC BY-SA 4.0) : aucune photo libre du stade de Kégué n'a été trouvée. À remplacer par une photo officielle autorisée.
+- `stade-de-kegue.svg` est un **visuel neutre « photo à venir »** : aucune photo libre du stade de Kégué n'a été trouvée. À remplacer par une photo officielle autorisée.
 - Les événements seedés sont des **données de démonstration** ; les visuels illustrent le type d'événement, pas l'événement réel.
 - Les licences CC BY et CC BY-SA exigent une attribution : le crédit est affiché sous l'image sur les pages détail (lieu et événement) et listé ci-dessus. Pour CC BY-SA, les versions modifiées (redimensionnement) restent sous la même licence.
 - Aucune photo protégée n'a été copiée sans autorisation.

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Visuel neutre — photo du stade à venir">
+  <rect width="800" height="500" fill="#0E1223"/>
+  <g fill="none" stroke="#334155" stroke-width="6">
+    <ellipse cx="400" cy="360" rx="300" ry="90"/>
+    <ellipse cx="400" cy="360" rx="220" ry="60"/>
+    <line x1="400" y1="300" x2="400" y2="420"/>
+    <circle cx="400" cy="360" r="14" fill="#334155" stroke="none"/>
+    <path d="M150 250 Q400 120 650 250"/>
+    <path d="M190 285 Q400 175 610 285"/>
+  </g>
+  <g fill="#16A34A">
+    <circle cx="400" cy="150" r="10"/>
+    <circle cx="330" cy="185" r="7"/>
+    <circle cx="470" cy="185" r="7"/>
+  </g>
+  <text x="400" y="460" text-anchor="middle" font-family="Inter, sans-serif" font-size="26" fill="#94A3B8">Stade de Kégué — photo officielle à venir</text>
+</svg>

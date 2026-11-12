@@ -1,8 +1,13 @@
 #!/bin/sh
 set -e
 cd /var/www/app
-# Clé d'application : générée si absente (aucune session/chiffrement persistant n'est utilisé)
-case "$APP_KEY" in base64:*) ;; *) export APP_KEY="$(php artisan key:generate --show)";; esac
+# Clé d'application : générée si absente (aucune session/chiffrement persistant n'est utilisé).
+# Persistée dans .env pour que les sessions « docker compose exec » (tests, artisan) la voient.
+case "$APP_KEY" in base64:*) ;; *)
+  export APP_KEY="$(php artisan key:generate --show)"
+  touch .env
+  if grep -q '^APP_KEY=' .env; then sed -i "s|^APP_KEY=.*|APP_KEY=$APP_KEY|" .env; else echo "APP_KEY=$APP_KEY" >> .env; fi
+;; esac
 if [ -n "$DB_HOST" ]; then
   echo "Attente de PostgreSQL ($DB_HOST:${DB_PORT:-5432})..."
   until nc -z "$DB_HOST" "${DB_PORT:-5432}"; do sleep 1; done

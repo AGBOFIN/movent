@@ -184,7 +184,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Palais des Congrès de Lomé', 'slug' => 'palais-des-congres-lome', 'type' => 'PALACE', 'city' => 'Lomé',
                 'address' => 'Avenue du Golfe, quartier administratif, Lomé',
-                'description' => "Centre de congrès et de spectacles inauguré en 1981, fruit de la coopération Togo–Chine. Grande salle pouvant accueillir environ 5 000 personnes, ainsi que des salles de conférence et une esplanade pour manifestations publiques.",
+                'description' => "Centre de congrès et de spectacles inauguré en 1981, fruit de la coopération Togo–Chine, ancien siège de l'Assemblée nationale. Grande salle d'environ 5 000 personnes. Le bâtiment a été fermé au public en juin 2024 pour une rénovation complète ; les travaux touchaient à leur fin début 2025 et une conférence panafricaine était attendue à la réouverture.",
                 'capacity' => 5000,
                 'amenities' => 'Grande salle de spectacle (~5 000 places), salles de conférence, esplanade',
                 'website' => null,
@@ -208,8 +208,8 @@ class DatabaseSeeder extends Seeder
                 'capacity' => 25000,
                 'amenities' => 'Pelouse naturelle, piste d\'athlétisme, gradins, vestiaires, écran géant',
                 'website' => null,
-                'image' => '/img/lieux/stade-de-kegue.jpg',
-                'image_credit' => 'Photo : Ed Suter — CC BY-SA 4.0 — Wikimedia Commons (image de substitution, stade générique)',
+                'image' => '/img/lieux/stade-de-kegue.svg',
+                'image_credit' => 'Visuel neutre — photo officielle du stade à fournir',
             ],
             [
                 'name' => 'Institut français du Togo', 'slug' => 'institut-francais-lome', 'type' => 'CULTURAL_CENTER', 'city' => 'Lomé',
