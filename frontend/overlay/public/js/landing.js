@@ -1,5 +1,5 @@
 (function(){
-var tiles=['#d6ae69','#7057e8','#c9774a','#4f9d8f','#9bb86b','#b05a7a','#cfc4f5','#5b8fd0'],ic=['🎤','🎟️','🎸','🎧','🎉','🎭','🏆','📸'];
+var tiles=['#e2703a','#d9a441','#9ab584','#c96f4a','#7a8c5f','#b4552d','#8a5a44','#5f7a52'],ic=['🎤','🎟️','🎸','🎧','🎉','🎭','🏆','📸'];
 var t=document.getElementById('trk'),h='';
 for(var k=0;k<2;k++)for(var i=0;i<tiles.length;i++)h+='<div class="tile" style="background:'+tiles[i]+'">'+ic[i]+'</div>';
 t.innerHTML=h;
