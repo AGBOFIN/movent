@@ -15,7 +15,7 @@ class VenueFlowTest extends TestCase
     private function venue(array $over = []): Venue
     {
         return Venue::create(array_merge([
-            'name' => 'Hôtel Test', 'slug' => 'hotel-test-'.Str::lower(Str::random(6)),
+            'name' => 'Salle Test', 'slug' => 'hotel-test-'.Str::lower(Str::random(6)),
             'type' => 'HOTEL', 'city' => 'Lomé', 'address' => 'Rue 1',
             'capacity' => 500, 'is_active' => true,
         ], $over));
@@ -24,7 +24,7 @@ class VenueFlowTest extends TestCase
     private function eventFor(Venue $v, string $status = 'APPROVED'): Event
     {
         $e = new Event([
-            'category_id' => \App\Models\Category::create(['name' => 'Concert'])->id,
+            'category_id' => \App\Models\Category::firstOrCreate(['name' => 'Concert'])->id,
             'venue_id' => $v->id,
             'title' => 'Soirée '.$v->name,
             'location' => $v->name.', '.$v->city,
@@ -55,7 +55,7 @@ class VenueFlowTest extends TestCase
         $this->venue(['city' => 'Kara', 'slug' => 'kara-1']);
         $this->assertCount(1, $this->getJson('/api/venues?city=Lomé')->json());
         $this->assertCount(1, $this->getJson('/api/venues?city=Kara')->json());
-        $this->assertCount(2, $this->getJson('/api/venues?q=hotel')->json());
+        $this->assertCount(2, $this->getJson('/api/venues?q=salle')->json());
     }
 
     public function test_le_detail_d_un_lieu_liste_ses_evenements_a_venir(): void
@@ -96,7 +96,7 @@ class VenueFlowTest extends TestCase
     public function test_venue_id_invalide_refuse_a_la_creation(): void
     {
         $org = $this->auth(['role' => 'ORGANIZER', 'sub' => (string) Str::uuid()]);
-        $c = \App\Models\Category::create(['name' => 'Concert']);
+        $c = \App\Models\Category::firstOrCreate(['name' => 'Concert']);
         $this->postJson('/api/events', [
             'title' => 'Test', 'category_id' => $c->id, 'location' => 'Lomé',
             'start_at' => now()->addDays(3)->toIso8601String(),

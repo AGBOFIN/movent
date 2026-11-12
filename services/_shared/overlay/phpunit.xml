@@ -29,5 +29,12 @@
         <env name="MAIL_MAILER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
         <env name="SESSION_DRIVER" value="array" force="true"/>
+        <!-- <server> : Laravel lit $_SERVER en priorité sur $_ENV/getenv ;
+             sans ces entrées, les variables injectées par docker compose
+             (DB_CONNECTION=pgsql, APP_KEY vide) l'emportaient sur <env>. -->
+        <server name="APP_ENV" value="testing" force="true"/>
+        <server name="APP_KEY" value="base64:9H282QqCrBR2N+y0GMadTtL7DrvqQr3K/1Sz4QPCVhY=" force="true"/>
+        <server name="DB_CONNECTION" value="sqlite" force="true"/>
+        <server name="DB_DATABASE" value=":memory:" force="true"/>
     </php>
 </phpunit>

@@ -15,7 +15,7 @@ class HoldTest extends TestCase
 
     private function approvedEvent(int $capacity = 10): Event
     {
-        $c = Category::create(['name' => 'Concert']);
+        $c = Category::firstOrCreate(['name' => 'Concert']);
         $e = new Event([
             'category_id' => $c->id, 'title' => 'Event', 'location' => 'Lomé',
             'start_at' => now()->addDays(3), 'end_at' => now()->addDays(3)->addHour(),
@@ -119,7 +119,7 @@ class HoldTest extends TestCase
 
     public function test_hold_refuse_un_evenement_non_approuve(): void
     {
-        $c = Category::create(['name' => 'Sport']);
+        $c = Category::firstOrCreate(['name' => 'Sport']);
         $e = new Event([
             'category_id' => $c->id, 'title' => 'Brouillon', 'location' => 'Lomé',
             'start_at' => now()->addDays(3), 'end_at' => now()->addDays(3)->addHour(),

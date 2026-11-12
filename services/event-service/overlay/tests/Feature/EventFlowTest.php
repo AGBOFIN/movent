@@ -14,7 +14,7 @@ class EventFlowTest extends TestCase
 
     private function category(): Category
     {
-        return Category::create(['name' => 'Concert']);
+        return Category::firstOrCreate(['name' => 'Concert']);
     }
 
     private function makeEvent(string $status = 'APPROVED', array $over = []): Event
