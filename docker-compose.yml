@@ -2,7 +2,7 @@
 x-laravel-env: &laravel-env
   APP_ENV: production
   APP_DEBUG: "false"
-  APP_KEY: ${APP_KEY:-}
+  APP_KEY: ${APP_KEY:-base64:9H282QqCrBR2N+y0GMadTtL7DrvqQr3K/1Sz4QPCVhY=}
   LOG_CHANNEL: stderr
   CACHE_STORE: file
   SESSION_DRIVER: file
