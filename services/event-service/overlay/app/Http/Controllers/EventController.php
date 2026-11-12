@@ -15,6 +15,7 @@ class EventController extends Controller
             'title' => 'required|string|max:150',
             'description' => 'nullable|string|max:5000',
             'category_id' => 'required|uuid|exists:categories,id',
+            'venue_id' => 'nullable|uuid|exists:venues,id',
             'image' => 'nullable|url|max:500',
             'location' => 'required|string|max:200',
             'start_at' => 'required|date|after:now',
@@ -39,9 +40,15 @@ class EventController extends Controller
     /** Catalogue public : uniquement les événements APPROVED à venir. */
     public function index(Request $r)
     {
-        $r->validate(['category_id' => 'nullable|uuid', 'price_max' => 'nullable|numeric|min:0', 'q' => 'nullable|string|max:100', 'organizer_kind' => 'nullable|in:INSTITUTION,PRIVATE']);
+        $r->validate(['category_id' => 'nullable|uuid', 'venue_id' => 'nullable|uuid', 'city' => 'nullable|string|max:80', 'price_max' => 'nullable|numeric|min:0', 'q' => 'nullable|string|max:100', 'organizer_kind' => 'nullable|in:INSTITUTION,PRIVATE']);
         Hold::expireStale();
-        $q = Event::with('category')->where('status', 'APPROVED')->where('end_at', '>=', now());
+        $q = Event::with(['category', 'venue'])->where('status', 'APPROVED')->where('end_at', '>=', now());
+        if ($r->filled('venue_id')) {
+            $q->where('venue_id', $r->query('venue_id'));
+        }
+        if ($r->filled('city')) {
+            $q->whereHas('venue', fn ($w) => $w->where('city', $r->query('city')));
+        }
         if ($r->filled('q')) {
             $like = '%'.mb_strtolower($r->query('q')).'%';
             $q->where(fn ($w) => $w->whereRaw('LOWER(title) LIKE ?', [$like])->orWhereRaw('LOWER(location) LIKE ?', [$like]));
@@ -63,7 +70,7 @@ class EventController extends Controller
     public function show(string $id)
     {
         Hold::expireStale();
-        return Event::with('category')->where('status', 'APPROVED')->findOrFail($id);
+        return Event::with(['category', 'venue'])->where('status', 'APPROVED')->findOrFail($id);
     }
 
     public function store(Request $r)
@@ -75,7 +82,7 @@ class EventController extends Controller
         $e->available_places = $d['capacity'];
         $e->status = 'DRAFT';
         $e->save();
-        return response()->json($e->load('category'), 201);
+        return response()->json($e->load(['category', 'venue']), 201);
     }
 
     public function update(Request $r, string $id)
@@ -87,7 +94,7 @@ class EventController extends Controller
         $e->fill($d);
         $e->available_places = $d['capacity'];
         $e->save();
-        return $e->load('category');
+        return $e->load(['category', 'venue']);
     }
 
     public function destroy(Request $r, string $id)
@@ -101,12 +108,12 @@ class EventController extends Controller
 
     public function myEvents(Request $r)
     {
-        return Event::with('category')->where('organizer_id', $r->attributes->get('auth')['id'])->orderByDesc('created_at')->get();
+        return Event::with(['category', 'venue'])->where('organizer_id', $r->attributes->get('auth')['id'])->orderByDesc('created_at')->get();
     }
 
     public function myEvent(Request $r, string $id)
     {
-        $e = Event::with('category')->findOrFail($id);
+        $e = Event::with(['category', 'venue'])->findOrFail($id);
         $this->own($r, $e);
         return $e;
     }
@@ -117,7 +124,7 @@ class EventController extends Controller
         $this->own($r, $e);
         abort_unless(in_array($e->status, ['DRAFT', 'REJECTED'], true), 409, 'Cet événement ne peut pas être soumis.');
         $e->update(['status' => 'PENDING', 'rejection_reason' => null]);
-        return $e->load('category');
+        return $e->load(['category', 'venue']);
     }
 
     public function approve(string $id)
@@ -125,7 +132,7 @@ class EventController extends Controller
         $e = Event::findOrFail($id);
         abort_unless($e->status === 'PENDING', 409, 'Seuls les événements en attente peuvent être validés.');
         $e->update(['status' => 'APPROVED', 'rejection_reason' => null]);
-        return $e->load('category');
+        return $e->load(['category', 'venue']);
     }
 
     public function reject(Request $r, string $id)
@@ -134,7 +141,7 @@ class EventController extends Controller
         $e = Event::findOrFail($id);
         abort_unless($e->status === 'PENDING', 409, 'Seuls les événements en attente peuvent être rejetés.');
         $e->update(['status' => 'REJECTED', 'rejection_reason' => $d['reason']]);
-        return $e->load('category');
+        return $e->load(['category', 'venue']);
     }
 
     public function cancel(Request $r, string $id)
@@ -143,14 +150,14 @@ class EventController extends Controller
         $this->own($r, $e);
         abort_if($e->status === 'CANCELLED', 409, 'Événement déjà annulé.');
         $e->update(['status' => 'CANCELLED']);
-        return $e->load('category');
+        return $e->load(['category', 'venue']);
     }
 
     /** Administration : tous les événements, filtre par statut. */
     public function adminIndex(Request $r)
     {
         $r->validate(['status' => 'nullable|in:DRAFT,PENDING,APPROVED,REJECTED,CANCELLED']);
-        $q = Event::with('category')->orderByDesc('created_at');
+        $q = Event::with(['category', 'venue'])->orderByDesc('created_at');
         if ($r->filled('status')) {
             $q->where('status', $r->query('status'));
         }

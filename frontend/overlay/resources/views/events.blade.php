@@ -7,6 +7,8 @@
   <input id="q" type="search" placeholder="Rechercher un événement ou un lieu…">
   <select id="cat"></select>
   <select id="kind"><option value="">Tous les organisateurs</option><option value="INSTITUTION">Institutions</option><option value="PRIVATE">Organisateurs privés</option></select>
+  <select id="city"></select>
+  <select id="venue"></select>
   <label class="chk"><input id="free" type="checkbox"> Gratuits uniquement</label>
 </div>
 <div id="grid" class="grid"></div>
