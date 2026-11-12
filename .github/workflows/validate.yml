@@ -43,7 +43,7 @@ jobs:
       - name: Parcours de validation (inscription → événement → modération → réservation → paiement → billet)
         run: bash scripts/e2e-smoke.sh http://localhost:8080
 
-      - name: Mémoire des conteneurs (VM cible : 4 Go)
+      - name: "Mémoire des conteneurs (VM cible : 4 Go)"
         run: docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
 
       - name: Arrêt stack locale
