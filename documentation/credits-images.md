@@ -22,6 +22,7 @@ Toutes les photos proviennent de **Wikimedia Commons** (licences libres). Elles 
 
 | Fichier | Source (Wikimedia Commons) | Auteur | Licence | Page |
 |---|---|---|---|---|
+| `img/events/forum-economique.jpg` | Ilham Aliyev attended panel discussion on "Strategic Outlook - Eurasia" as part of World Economic Forum 01.jpg | World Economic Forum | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Ilham_Aliyev_attended_panel_discussion_on_%E2%80%9CStrategic_Outlook-_Eurasia%E2%80%9D_as_part_of_World_Economic_Forum_01.jpg |
 | `img/events/nuit-live.jpg` | A large crowd enjoys a music concert illuminated by colorful lights and a stunning stage display.jpg | Shixart1985 | CC BY 2.0 | https://commons.wikimedia.org/wiki/File:A_large_crowd_enjoys_a_music_concert_illuminated_by_colorful_lights_and_a_stunning_stage_display.jpg |
 | `img/events/conference-ia.jpg` | Fake Conference - Wikimedia Israel & Reichman University - Audience Claps.jpg | Gilad Kavalerchik | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Fake_Conference_-_Wikimedia_Israel_&_Reichman_University_-_Audience_Claps.jpg |
 | `img/events/finale-foot.jpg` | Football - 2023 Africa Cup of Nations - Finals - Guinea v Senegal - Charles Konan Stadium - Yamoussoukro - Cote dIvoire - 53483413476.jpg | feguifoot | Public domain | https://commons.wikimedia.org/wiki/File:Football_-_2023_Africa_Cup_of_Nations_-_Finals_-_Guinea_v_Senegal_-_Charles_Konan_Stadium_-_Yamoussoukro_-_Cote_dIvoire_-_53483413476.jpg |

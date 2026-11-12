@@ -112,7 +112,7 @@ class DatabaseSeeder extends Seeder
         foreach ($map as $k => $f) {
             if (str_contains($title, $k)) {
                 $c = [
-                    'forum-economique.jpg' => 'Photo : Brahmav — CC BY 4.0 — Wikimedia Commons',
+                    'forum-economique.jpg' => 'Photo : World Economic Forum — CC BY 4.0 — Wikimedia Commons',
                     'nuit-live.jpg' => 'Photo : Shixart1985 — CC BY 2.0 — Wikimedia Commons',
                     'conference-ia.jpg' => 'Photo : Gilad Kavalerchik — CC BY-SA 4.0 — Wikimedia Commons',
                     'finale-foot.jpg' => 'Photo : feguifoot — domaine public — Wikimedia Commons',
