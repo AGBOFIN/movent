@@ -15,18 +15,24 @@ jobs:
       - name: Fichier .env de test (secrets factices, jamais commité)
         run: cp .env.example .env
 
-      - name: Build + démarrage de la stack locale (8 conteneurs)
-        run: docker compose up --build -d
+      - name: Validation de la configuration Compose
+        run: docker compose config -q && docker compose -f docker-compose.prod.yml config -q
+
+      - name: Build des images (stack locale)
+        run: docker compose build
+
+      - name: Démarrage de la stack locale (8 conteneurs)
+        run: docker compose up -d
 
       - name: Attente que la passerelle réponde
         run: |
           for i in $(seq 1 120); do
             if curl -sf http://localhost:8080/api/events -o /tmp/events.json; then
-              echo "Gateway OK après ${i}0s"; cat /tmp/events.json | head -c 400; exit 0
+              echo "Gateway OK après ${i}0s"; head -c 400 /tmp/events.json; exit 0
             fi
             sleep 10
           done
-          echo "TIMEOUT gateway"; docker compose ps; docker compose logs --tail=100; exit 1
+          echo "TIMEOUT gateway"; exit 1
 
       - name: État des conteneurs + santé
         run: docker compose ps
@@ -53,7 +59,8 @@ jobs:
       - name: Build + démarrage stack PRODUCTION (Caddy, DOMAIN=:80 → HTTP)
         run: |
           sed -i 's/^DOMAIN=.*/DOMAIN=:80/' .env
-          docker compose -f docker-compose.prod.yml up --build -d
+          docker compose -f docker-compose.prod.yml build
+          docker compose -f docker-compose.prod.yml up -d
 
       - name: Attente passerelle prod (port 80)
         run: |
@@ -63,13 +70,13 @@ jobs:
             fi
             sleep 10
           done
-          echo "TIMEOUT prod"; docker compose -f docker-compose.prod.yml ps; docker compose -f docker-compose.prod.yml logs --tail=100; exit 1
+          echo "TIMEOUT prod"; exit 1
 
       - name: Smoke test prod (pages + API + routes internes bloquées)
         run: bash scripts/e2e-smoke.sh http://localhost
 
       - name: Mémoire stack prod
-        run: docker compose -f docker-compose.prod.yml exec -T frontend true 2>/dev/null; docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
+        run: docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
 
       - name: Logs Caddy (diagnostic HTTPS)
         if: always()
@@ -78,3 +85,13 @@ jobs:
       - name: Arrêt stack prod
         if: always()
         run: docker compose -f docker-compose.prod.yml down
+
+      - name: Diagnostics en cas d'échec
+        if: failure()
+        run: |
+          echo "===== docker compose ps ====="
+          docker compose ps || true
+          echo "===== logs conteneurs (200 dernières lignes) ====="
+          docker compose logs --tail=200 || true
+          docker compose -f docker-compose.prod.yml ps || true
+          docker compose -f docker-compose.prod.yml logs --tail=200 || true

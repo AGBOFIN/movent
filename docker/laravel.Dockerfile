@@ -1,9 +1,8 @@
 # Image commune aux 3 microservices et au frontend Laravel.
 # Le squelette Laravel 11 est créé au build, puis on y superpose le code de chaque service (overlay).
 FROM php:8.3-cli
-RUN apt-get update && apt-get install -y --no-install-recommends git unzip libpq-dev libzip-dev libpng-dev libfreetype6-dev libjpeg-dev netcat-openbsd \
- && docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install pdo_pgsql pdo_sqlite zip gd bcmath \
+RUN apt-get update && apt-get install -y --no-install-recommends git unzip libpq-dev libzip-dev netcat-openbsd \
+ && docker-php-ext-install pdo_pgsql pdo_sqlite zip bcmath \
  && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/app
