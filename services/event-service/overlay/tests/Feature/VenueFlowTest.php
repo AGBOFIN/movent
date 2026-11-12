@@ -63,7 +63,8 @@ class VenueFlowTest extends TestCase
         $v = $this->venue();
         $this->eventFor($v, 'APPROVED');
         $this->eventFor($v, 'DRAFT');   // non public
-        $this->venue()->each(fn ($o) => $this->eventFor($o)); // autre lieu
+        $autre = $this->venue(['slug' => 'autre-lieu']);
+        $this->eventFor($autre); // autre lieu
 
         $r = $this->getJson('/api/venues/'.$v->slug)->assertOk();
         $this->assertSame($v->name, $r->json('venue.name'));
