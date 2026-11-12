@@ -52,10 +52,6 @@ jobs:
       - name: "Mémoire des conteneurs (VM cible : 4 Go)"
         run: docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
 
-      - name: Arrêt stack locale
-        if: always()
-        run: docker compose down
-
       - name: Build + démarrage stack PRODUCTION (Caddy, DOMAIN=:80 → HTTP)
         run: |
           sed -i 's/^DOMAIN=.*/DOMAIN=:80/' .env
@@ -82,10 +78,6 @@ jobs:
         if: always()
         run: docker compose -f docker-compose.prod.yml logs caddy | tail -40
 
-      - name: Arrêt stack prod
-        if: always()
-        run: docker compose -f docker-compose.prod.yml down
-
       - name: Diagnostics en cas d'échec
         if: failure()
         run: |
@@ -95,3 +87,11 @@ jobs:
           docker compose logs --tail=200 || true
           docker compose -f docker-compose.prod.yml ps || true
           docker compose -f docker-compose.prod.yml logs --tail=200 || true
+
+      - name: Arrêt stack prod
+        if: always()
+        run: docker compose -f docker-compose.prod.yml down
+
+      - name: Arrêt stack locale
+        if: always()
+        run: docker compose down
