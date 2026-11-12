@@ -1,0 +1,80 @@
+name: Validation MOVENT (Docker de bout en bout)
+
+on:
+  push:
+    branches: [deploy-prod, ci/**]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fichier .env de test (secrets factices, jamais commité)
+        run: cp .env.example .env
+
+      - name: Build + démarrage de la stack locale (8 conteneurs)
+        run: docker compose up --build -d
+
+      - name: Attente que la passerelle réponde
+        run: |
+          for i in $(seq 1 120); do
+            if curl -sf http://localhost:8080/api/events -o /tmp/events.json; then
+              echo "Gateway OK après ${i}0s"; cat /tmp/events.json | head -c 400; exit 0
+            fi
+            sleep 10
+          done
+          echo "TIMEOUT gateway"; docker compose ps; docker compose logs --tail=100; exit 1
+
+      - name: État des conteneurs + santé
+        run: docker compose ps
+
+      - name: Tests PHPUnit — user-service
+        run: docker compose exec -T user-service php artisan test
+
+      - name: Tests PHPUnit — event-service
+        run: docker compose exec -T event-service php artisan test
+
+      - name: Tests PHPUnit — booking-service
+        run: docker compose exec -T booking-service php artisan test
+
+      - name: Parcours de validation (inscription → événement → modération → réservation → paiement → billet)
+        run: bash scripts/e2e-smoke.sh http://localhost:8080
+
+      - name: Mémoire des conteneurs (VM cible : 4 Go)
+        run: docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
+
+      - name: Arrêt stack locale
+        if: always()
+        run: docker compose down
+
+      - name: Build + démarrage stack PRODUCTION (Caddy, DOMAIN=:80 → HTTP)
+        run: |
+          sed -i 's/^DOMAIN=.*/DOMAIN=:80/' .env
+          docker compose -f docker-compose.prod.yml up --build -d
+
+      - name: Attente passerelle prod (port 80)
+        run: |
+          for i in $(seq 1 120); do
+            if curl -sf http://localhost/api/events -o /tmp/events-prod.json; then
+              echo "Prod OK après ${i}0s"; exit 0
+            fi
+            sleep 10
+          done
+          echo "TIMEOUT prod"; docker compose -f docker-compose.prod.yml ps; docker compose -f docker-compose.prod.yml logs --tail=100; exit 1
+
+      - name: Smoke test prod (pages + API + routes internes bloquées)
+        run: bash scripts/e2e-smoke.sh http://localhost
+
+      - name: Mémoire stack prod
+        run: docker compose -f docker-compose.prod.yml exec -T frontend true 2>/dev/null; docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"
+
+      - name: Logs Caddy (diagnostic HTTPS)
+        if: always()
+        run: docker compose -f docker-compose.prod.yml logs caddy | tail -40
+
+      - name: Arrêt stack prod
+        if: always()
+        run: docker compose -f docker-compose.prod.yml down
