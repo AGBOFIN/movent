@@ -26,6 +26,7 @@
   --tr:.2s ease;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--font);-webkit-font-smoothing:antialiased}
 h1,h2,h3,.brand,.btn,.tabs button,.badge{font-family:var(--font)}
@@ -36,13 +37,14 @@ a{color:var(--accent)}
 .top{background:rgba(2,6,23,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 5vw;min-height:64px;position:sticky;top:0;z-index:50}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand img{height:34px;width:auto;display:block}
-.top nav{display:flex;gap:6px;align-items:center}
-.top nav a{color:var(--ink2);text-decoration:none;font-weight:500;font-size:14.5px;padding:10px 14px;border-radius:10px;transition:color var(--tr),background var(--tr)}
-.top nav a:hover{color:var(--ink);background:var(--surface)}
+.top nav.desk{display:flex;gap:6px;align-items:center}
+.top nav.desk a{color:var(--ink2);text-decoration:none;font-weight:500;font-size:14.5px;padding:10px 14px;border-radius:10px;transition:color var(--tr),background var(--tr)}
+.top nav.desk a:hover{color:var(--ink);background:var(--surface)}
 .usermenu{position:relative}
 .avatar{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:14px;cursor:pointer;display:grid;place-items:center;transition:transform var(--tr)}
 .avatar:hover{transform:scale(1.05)}
 .dropdown{position:absolute;right:0;top:52px;background:var(--card);border:1px solid var(--border);border-radius:12px;min-width:210px;padding:6px;box-shadow:var(--shadow);display:grid;z-index:60}
+.dropdown[hidden]{display:none}
 .dropdown a{padding:11px 14px;border-radius:8px;color:var(--ink);text-decoration:none;font-weight:600;font-size:14px;display:flex;align-items:center;min-height:44px}
 .dropdown a:hover{background:var(--surface)}
 .mnav .dropdown{position:static;margin-top:6px;box-shadow:none}

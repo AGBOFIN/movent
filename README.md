@@ -16,8 +16,8 @@ Plateforme web de découverte, gestion et réservation d'événements, construit
 
 | Rôle | Fonctionnalités |
 |---|---|
-| **PARTICIPANT** | Inscription/connexion, catalogue avec recherche et filtres, détail d'un événement, réservation (gratuite ou payante), paiement simulé (succès/échec), annulation, historique des réservations, billets PDF avec QR, profil |
-| **ORGANIZER** | Tableau de bord et statistiques, création/modification d'événements, soumission à validation, suivi du statut et du motif de rejet, annulation, liste des réservations de ses événements |
+| **PARTICIPANT** | Inscription/connexion, catalogue avec recherche et filtres (catégorie, type d'organisateur, gratuit, ville, lieu), pages « Lieux » (9 lieux togolais avec photos et détail), détail d'un événement, réservation (gratuite ou payante), paiement simulé (succès/échec), annulation, historique des réservations, billets PDF avec QR, profil |
+| **ORGANIZER** | Tableau de bord et statistiques, création/modification d'événements (avec sélection d'un lieu), soumission à validation, suivi du statut et du motif de rejet, annulation, liste des réservations de ses événements |
 | **ADMIN** | Statistiques globales, modération (valider / rejeter avec motif), liste de tous les événements, gestion des utilisateurs (rôle, activation), toutes les réservations |
 | **NATIONAL_AUTHORITY** | Supervision nationale **en lecture seule** : statistiques consolidées, tous les événements (statut, type institution/privé), tous les utilisateurs, toutes les réservations — aucune action d'écriture |
 
@@ -43,7 +43,7 @@ flowchart LR
 | Gateway (Nginx) | Point d'entrée unique, route `/api/*` vers le bon service, **bloque** les routes internes (`hold`, `confirm-hold`, `release-hold`) | `movent-gateway` |
 | Frontend (Laravel + Blade + JS) | Pages publiques et trois espaces ; appelle l'API via la gateway | `movent-frontend` |
 | User Service | Inscription, connexion, **émission des JWT**, profil, gestion des utilisateurs | `movent-user-service` |
-| Event Service | Catégories, événements, validation, **blocage atomique des places** | `movent-event-service` |
+| Event Service | Catégories, **lieux**, événements, validation, **blocage atomique des places** | `movent-event-service` |
 | Booking Service | Réservations, paiement simulé, billets (QR + PDF), statistiques | `movent-booking-service` |
 | 3 × PostgreSQL | Une base par service | `movent-db-users/events/bookings` |
 
@@ -195,6 +195,8 @@ docker compose up --build   # premier build : plusieurs minutes (création des s
 ```
 Ouvrir **http://localhost:8080**. Au démarrage, chaque service attend sa base, exécute `migrate` puis `db:seed`.
 
+`APP_URL` est déduite automatiquement (`http://localhost:8080` en local, `https://<DOMAIN>` en production) pour que les URLs des assets (CSS/JS/images) pointent vers la bonne origine. En production, `deploy.sh` la renseigne dans `.env` si vous la laissez vide.
+
 Arrêt : `docker compose down` (données conservées) · remise à zéro : `docker compose down -v`.
 
 Sauvegarde / restauration d'une base :
@@ -212,7 +214,7 @@ cat events.sql | docker exec -i movent-db-events psql -U movent movent_events
 | PARTICIPANT | participant1@movent.test · participant2@movent.test · participant3@movent.test |
 | NATIONAL_AUTHORITY | autorite@movent.test (supervision, lecture seule) |
 
-Données de démo : 8 catégories et 10 événements (6 validés, 2 en attente, 1 brouillon, 1 rejeté).
+Données de démo : 8 catégories, **9 lieux** (hôtels, stade, centres culturels au Togo) et **8 événements validés** — des événements publics et privés togolais réalistes, marqués « données de démonstration ». Pages statiques : À propos, Contact, FAQ, Mentions légales, Conditions d'utilisation, Confidentialité. Crédits des photos dans `documentation/credits-images.md` ; conversion JPEG → WebP via `scripts/images-to-webp.sh`.
 
 ## 9. Routes API (via la gateway, préfixe `/api`)
 
@@ -265,7 +267,7 @@ docker compose exec event-service  php artisan test
 docker compose exec booking-service php artisan test
 ```
 
-Couverture : inscription et e-mail déjà utilisé, contrôle des rôles, cycle de validation d'un événement (brouillon → soumis → validé/rejeté avec motif), refus d'une quantité supérieure aux places, holds concurrents sur les dernières places, paiement simulé réussi/échoué/expiré, unicité des QR, accès interdit au billet d'un autre, routes internes sans clé refusées. Ils tournent en SQLite (`:memory:`) ; les `CHECK` PostgreSQL restent actifs en production.
+Couverture : inscription et e-mail déjà utilisé, contrôle des rôles, IDOR (accès aux ressources d'autrui), limitation de débit, cycle de validation d'un événement (brouillon → soumis → validé/rejeté avec motif), lieux et filtres, seeders, refus d'une quantité supérieure aux places, holds concurrents sur les dernières places, paiement simulé réussi/échoué/expiré, unicité des QR, accès interdit au billet d'un autre, routes internes sans clé refusées. La plupart tournent en SQLite (`:memory:`) ; **le test de concurrence (« deux holds simultanés ») tourne en CI contre un vrai PostgreSQL** (`phpunit.pgsql.xml`, base `movent_events_test`) pour prouver les verrous `FOR UPDATE`. Les `CHECK` PostgreSQL restent actifs en production.
 
 **Tests manuels de validation** (interface ou `documentation/api.http`) :
 1. Inscription valide ; refus d'un e-mail déjà utilisé ; connexion correcte/incorrecte ; accès refusé à un espace non autorisé.
