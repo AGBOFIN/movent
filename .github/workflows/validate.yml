@@ -9,6 +9,8 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -94,7 +96,8 @@ jobs:
         run: |
           { echo "### CI — test de concurrence pgsql"; echo '```'; if [ -f /tmp/pgsql-test.log ]; then tail -80 /tmp/pgsql-test.log; else echo "(log absent)"; fi; echo '```'; } > /tmp/comment.md
           jq -n --rawfile body /tmp/comment.md '{body: $body}' \
-            | gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" --input -
+            | gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" --input - \
+            || { echo "GH_COMMENT_FAILED"; gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" --input - 2>&1 | tail -5; }
 
       - name: Diagnostics en cas d'échec
         if: failure()
