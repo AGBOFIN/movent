@@ -45,11 +45,12 @@ jobs:
 
       - name: Tests de concurrence sur PostgreSQL réel (anti-survente)
         run: |
+          set -o pipefail
           # Base de test dédiée et jetable (movent_events_test).
           # createdb échoue si elle existe déjà : sans gravité, migrate:fresh la nettoie.
           docker compose exec -T event-db createdb -U movent movent_events_test || true
           docker compose exec -T -e DB_DATABASE=movent_events_test event-service \
-            php vendor/bin/phpunit -c phpunit.pgsql.xml --filter test_deux_holds --display-warnings --display-deprecations
+            php vendor/bin/phpunit -c phpunit.pgsql.xml --filter test_deux_holds --display-warnings --display-deprecations 2>&1 | tee /tmp/pgsql-test.log
 
       - name: Tests PHPUnit — booking-service
         run: docker compose exec -T booking-service php artisan test
@@ -85,6 +86,15 @@ jobs:
       - name: Logs Caddy (diagnostic HTTPS)
         if: always()
         run: docker compose -f docker-compose.prod.yml logs caddy | tail -40
+
+      - name: Publier le diagnostic PHPUnit en commentaire de commit
+        if: failure() && hashFiles('/tmp/pgsql-test.log') != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          { echo "### CI — test de concurrence pgsql"; echo '```'; tail -80 /tmp/pgsql-test.log; echo '```'; } > /tmp/comment.md
+          jq -n --rawfile body /tmp/comment.md '{body: $body}' \
+            | gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" --input -
 
       - name: Diagnostics en cas d'échec
         if: failure()
