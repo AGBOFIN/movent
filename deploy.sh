@@ -18,6 +18,18 @@ if grep -qE 'a-changer|change-me|change_me' .env; then
   exit 1
 fi
 
+# APP_URL : déduite de DOMAIN si laissée vide
+if ! grep -qE '^APP_URL=.+' .env; then
+  DOMAIN_VAL=$(grep -E '^DOMAIN=' .env | cut -d= -f2-)
+  if   [[ "$DOMAIN_VAL" == ":80" ]];       then APP_URL="http://localhost"
+  elif [[ "$DOMAIN_VAL" == :* ]];          then APP_URL="http://localhost${DOMAIN_VAL}"
+  elif [[ "$DOMAIN_VAL" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then APP_URL="http://${DOMAIN_VAL}"
+  else                                           APP_URL="https://${DOMAIN_VAL}"
+  fi
+  sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env
+  echo "==> APP_URL déduit : ${APP_URL}"
+fi
+
 echo "==> Build et démarrage des 8 conteneurs"
 $COMPOSE up -d --build
 

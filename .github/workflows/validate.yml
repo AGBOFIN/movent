@@ -70,6 +70,7 @@ jobs:
       - name: Build + démarrage stack PRODUCTION (Caddy, DOMAIN=:80 → HTTP)
         run: |
           sed -i 's/^DOMAIN=.*/DOMAIN=:80/' .env
+          sed -i 's/^APP_URL=.*/APP_URL=http:\/\/localhost/' .env
           docker compose -f docker-compose.prod.yml build
           docker compose -f docker-compose.prod.yml up -d
 

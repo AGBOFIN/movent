@@ -5,6 +5,7 @@ x-laravel-env: &laravel-env
   APP_ENV: production
   APP_DEBUG: "false"
   APP_KEY: ${APP_KEY:-}
+  APP_URL: ${APP_URL:-https://${DOMAIN}}
   LOG_CHANNEL: stderr
   CACHE_STORE: file
   SESSION_DRIVER: file
