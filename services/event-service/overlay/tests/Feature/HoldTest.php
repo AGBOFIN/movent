@@ -63,7 +63,7 @@ class HoldTest extends TestCase
         $e = $this->approvedEvent(5);
         $ok = $this->postJson("/api/events/{$e->id}/hold", ['booking_id' => (string) Str::uuid(), 'quantity' => 5], $this->holdHeaders());
         $ko = $this->postJson("/api/events/{$e->id}/hold", ['booking_id' => (string) Str::uuid(), 'quantity' => 1], $this->holdHeaders());
-        $this->assertTrue($ok->isCreated());
+        $ok->assertCreated();
         $ko->assertStatus(409);
         $this->assertSame(0, $e->fresh()->available_places);
     }
