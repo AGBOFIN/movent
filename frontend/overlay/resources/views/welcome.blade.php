@@ -17,7 +17,7 @@
 <body>
 
 <nav class="nav">
-  <a class="logo" href="/"><img src="{{ asset('img/logo.svg') }}" alt="MOVENT"></a>
+  <a class="logo" href="/"><img src="{{ asset('img/logo-light.svg') }}" alt="MOVENT"></a>
   <div class="navlinks">
     <a href="#catalogue">Événements</a>
     <a href="{{ url('/lieux') }}" class="hide-sm">Lieux</a>
@@ -224,7 +224,7 @@
 <footer class="foot">
   <div class="foot-in">
     <div>
-      <a class="logo" href="/"><img src="{{ asset('img/logo.svg') }}" alt="MOVENT" style="height:36px"></a>
+      <a class="logo" href="/"><img src="{{ asset('img/logo-light.svg') }}" alt="MOVENT" style="height:36px"></a>
       <p class="muted" style="color:var(--ink2);font-size:14px;margin:14px 0 0;max-width:340px">Discover. Book. Experience. — La plateforme togolaise de découverte et de réservation d'événements publics et privés.</p>
     </div>
     <div>
