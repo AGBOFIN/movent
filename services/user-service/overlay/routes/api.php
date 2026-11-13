@@ -14,11 +14,11 @@ Route::middleware('jwt')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::put('me', [AuthController::class, 'updateMe']);
 
-    // Lecture : admin et autorité nationale (supervision)
-    Route::get('users', [UserController::class, 'index'])->middleware('role:ADMIN,NATIONAL_AUTHORITY');
+    // Lecture : admin et autorité nationale (supervision) — débit limité
+    Route::get('users', [UserController::class, 'index'])->middleware(['role:ADMIN,NATIONAL_AUTHORITY', 'throttle:60,1']);
 
-    // Écriture : admin uniquement
-    Route::middleware('role:ADMIN')->group(function () {
+    // Écriture : admin uniquement, débit strict
+    Route::middleware(['role:ADMIN', 'throttle:30,1'])->group(function () {
         Route::patch('users/{id}/role', [UserController::class, 'updateRole'])->whereUuid('id');
         Route::patch('users/{id}/status', [UserController::class, 'updateStatus'])->whereUuid('id');
     });

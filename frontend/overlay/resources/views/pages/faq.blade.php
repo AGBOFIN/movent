@@ -12,7 +12,5 @@
   <p>Oui, depuis « Mes réservations », tant que le statut est « En attente » ou « Confirmée ». Les places sont alors libérées.</p>
   <h2 class="h2" style="font-size:20px">Comment publier un événement ?</h2>
   <p>Inscrivez-vous en tant qu'organisateur, créez votre événement dans votre espace, puis soumettez-le à validation. Il devient visible dans le catalogue une fois approuvé par l'administration.</p>
-  <h2 class="h2" style="font-size:20px">Que voit l'autorité nationale ?</h2>
-  <p>L'autorité nationale dispose d'un accès en lecture seule à l'ensemble des indicateurs, événements, utilisateurs et réservations pour la supervision du territoire.</p>
 </div>
 @endsection

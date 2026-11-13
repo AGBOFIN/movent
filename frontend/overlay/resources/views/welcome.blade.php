@@ -97,7 +97,7 @@
     <article class="bento-card wide reveal">
       <div class="b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
       <h3>Modération et confiance</h3>
-      <p>Chaque événement est examiné avant publication. Les organisateurs sont identifiés, les places comptabilisées en temps réel, et les autorités nationales supervisent l'ensemble de la plateforme en lecture seule.</p>
+      <p>Chaque événement est examiné avant publication. Les organisateurs sont identifiés, les places comptabilisées en temps réel et les transactions sécurisées.</p>
     </article>
     <article class="bento-card reveal">
       <div class="b-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
@@ -142,7 +142,7 @@
   <div class="section-head reveal">
     <div>
       <span class="eyebrow">Espaces</span>
-      <h2>Quatre espaces, un même écosystème</h2>
+      <h2>Deux espaces, un même écosystème</h2>
     </div>
     <p class="lede">Chaque profil dispose de son espace dédié, avec des permissions adaptées.</p>
   </div>
@@ -158,18 +158,6 @@
       <h3>Organisateur</h3>
       <p>Créez vos événements, choisissez un lieu partenaire, soumettez à validation et suivez vos réservations en temps réel.</p>
       <span class="role-go">Devenir organisateur →</span>
-    </a>
-    <a class="role reveal" href="{{ url('/register') }}">
-      <span class="role-tag">Institution</span>
-      <h3>Institution publique</h3>
-      <p>Ministères, collectivités et administrations publient leurs événements officiels avec le même niveau de visibilité que les acteurs privés.</p>
-      <span class="role-go">Référencer un événement →</span>
-    </a>
-    <a class="role reveal" href="{{ url('/login') }}">
-      <span class="role-tag">Supervision</span>
-      <h3>Autorité nationale</h3>
-      <p>Vue consolidée de la plateforme : statistiques, événements, utilisateurs et réservations — en lecture seule.</p>
-      <span class="role-go">Accéder à la supervision →</span>
     </a>
   </div>
 </section>

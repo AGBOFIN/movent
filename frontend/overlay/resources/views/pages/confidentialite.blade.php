@@ -7,7 +7,7 @@
   <h2 class="h2" style="font-size:20px">Données collectées</h2>
   <p>Nous collectons les informations nécessaires au fonctionnement du service : nom, prénom, e-mail, téléphone, réservations et billets. Aucune donnée n'est vendue à des tiers.</p>
   <h2 class="h2" style="font-size:20px">Utilisation</h2>
-  <p>Ces données servent à gérer les comptes, les réservations, l'émission des billets et la supervision du territoire par l'autorité nationale compétente.</p>
+  <p>Ces données servent à gérer les comptes, les réservations, l'émission des billets et des finalités de supervision et d'amélioration du service.</p>
   <h2 class="h2" style="font-size:20px">Sécurité</h2>
   <p>Les mots de passe sont hachés, les échanges sont chiffrés et les accès sont contrôlés par rôle. Les jetons de session expirent automatiquement.</p>
   <h2 class="h2" style="font-size:20px">Vos droits</h2>

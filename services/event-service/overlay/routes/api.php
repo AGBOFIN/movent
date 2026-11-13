@@ -14,7 +14,7 @@ Route::get('venues/cities', [VenueController::class, 'cities']);
 Route::get('venues/{slug}', [VenueController::class, 'show'])->where('slug', '[a-z0-9-]+');
 
 // Organisateur / Admin
-Route::middleware(['jwt', 'role:ORGANIZER,ADMIN'])->group(function () {
+Route::middleware(['jwt', 'role:ORGANIZER,ADMIN', 'throttle:60,1'])->group(function () {
     Route::post('events', [EventController::class, 'store']);
     Route::put('events/{id}', [EventController::class, 'update'])->whereUuid('id');
     Route::delete('events/{id}', [EventController::class, 'destroy'])->whereUuid('id');
@@ -28,10 +28,10 @@ Route::middleware(['jwt', 'role:ORGANIZER,ADMIN'])->group(function () {
 Route::get('event-stats', [EventController::class, 'stats'])->middleware(['jwt', 'role:ORGANIZER,ADMIN,NATIONAL_AUTHORITY']);
 
 // Supervision nationale (lecture) + administration (modération)
-Route::middleware(['jwt', 'role:ADMIN,NATIONAL_AUTHORITY'])->group(function () {
+Route::middleware(['jwt', 'role:ADMIN,NATIONAL_AUTHORITY', 'throttle:60,1'])->group(function () {
     Route::get('admin/events', [EventController::class, 'adminIndex']);
 });
-Route::middleware(['jwt', 'role:ADMIN'])->group(function () {
+Route::middleware(['jwt', 'role:ADMIN', 'throttle:60,1'])->group(function () {
     Route::post('events/{id}/approve', [EventController::class, 'approve'])->whereUuid('id');
     Route::post('events/{id}/reject', [EventController::class, 'reject'])->whereUuid('id');
 });

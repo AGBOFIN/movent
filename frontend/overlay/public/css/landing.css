@@ -137,7 +137,7 @@ select.fsel{background:var(--surface);border:1px solid var(--border);color:var(-
 @media(max-width:720px){.strip{grid-template-columns:1fr 1fr;width:calc(100% - 8vw)}}
 
 /* ---------- rôles ---------- */
-.roles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;max-width:860px;margin:0 auto}
 .role{background:linear-gradient(170deg,#FFFFFF,#F6FAFB);border:1px solid var(--border);border-radius:var(--r);padding:26px;display:grid;gap:10px;align-content:start;text-decoration:none;color:inherit;transition:transform var(--tr),border-color var(--tr),box-shadow var(--tr)}
 .role:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 16px 44px rgba(22,163,74,.12)}
 .role-tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3D2F05;background:var(--gold);border:1px solid var(--gold);border-radius:99px;padding:5px 12px;width:max-content}
@@ -145,8 +145,7 @@ select.fsel{background:var(--surface);border:1px solid var(--border);color:var(-
 .role p{margin:0;color:var(--ink2);font-size:13.5px;line-height:1.6;flex:1}
 .role-go{font-size:13.5px;font-weight:600;color:var(--ink)}
 .role:hover .role-go{color:var(--gold-2)}
-@media(max-width:1000px){.roles{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.roles{grid-template-columns:1fr}}
+
 
 /* ---------- étapes ---------- */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}

@@ -10,7 +10,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('bookings/{id}', [BookingController::class, 'show'])->whereUuid('id');
 
     // Écritures réservées aux rôles « clients » : l'autorité nationale est en lecture seule
-    Route::middleware('role:PARTICIPANT,ORGANIZER,ADMIN')->group(function () {
+    Route::middleware(['role:PARTICIPANT,ORGANIZER,ADMIN', 'throttle:30,1'])->group(function () {
         Route::post('bookings', [BookingController::class, 'store']);
         Route::post('bookings/{id}/pay', [BookingController::class, 'pay'])->whereUuid('id');
         Route::post('bookings/{id}/cancel', [BookingController::class, 'cancel'])->whereUuid('id');
@@ -21,7 +21,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('tickets/{id}/download', [TicketController::class, 'download'])->whereUuid('id');
 
     // Lecture : organisateur (les siennes), admin et autorité nationale (toutes)
-    Route::middleware('role:ORGANIZER,ADMIN,NATIONAL_AUTHORITY')->group(function () {
+    Route::middleware(['role:ORGANIZER,ADMIN,NATIONAL_AUTHORITY', 'throttle:60,1'])->group(function () {
         Route::get('organizer/bookings', [OrganizerController::class, 'bookings']);
         Route::get('booking-stats', [OrganizerController::class, 'stats']);
     });

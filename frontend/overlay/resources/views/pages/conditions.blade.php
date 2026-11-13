@@ -7,7 +7,7 @@
   <h2 class="h2" style="font-size:20px">1. Objet</h2>
   <p>MOVENT met en relation des participants et des organisateurs d'événements sur le territoire togolais. L'utilisation de la plateforme implique l'acceptation des présentes conditions.</p>
   <h2 class="h2" style="font-size:20px">2. Comptes</h2>
-  <p>Chaque utilisateur est responsable de la confidentialité de ses identifiants. Les rôles (participant, organisateur, administrateur, autorité nationale) déterminent les accès aux fonctionnalités.</p>
+  <p>Chaque utilisateur est responsable de la confidentialité de ses identifiants. Les rôles (participant, organisateur, administrateur) déterminent les accès aux fonctionnalités. Certains espaces d'administration et de supervision sont strictement réservés à des comptes habilités.</p>
   <h2 class="h2" style="font-size:20px">3. Événements et modération</h2>
   <p>Tout événement soumis par un organisateur est examiné avant publication. MOVENT peut rejeter ou retirer un événement ne respectant pas les règles de la plateforme.</p>
   <h2 class="h2" style="font-size:20px">4. Réservations et billets</h2>
