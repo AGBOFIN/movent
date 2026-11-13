@@ -52,7 +52,9 @@ jobs:
           # createdb échoue si elle existe déjà : sans gravité, migrate:fresh la nettoie.
           docker compose exec -T event-db createdb -U movent movent_events_test || true
           docker compose exec -T -e DB_DATABASE=movent_events_test event-service \
-            php vendor/bin/phpunit -c phpunit.pgsql.xml --filter test_deux_holds --display-warnings --display-deprecations 2>&1 | tee /tmp/pgsql-test.log
+            php artisan migrate:fresh --force --no-interaction 2>&1 | tee /tmp/pgsql-test.log
+          docker compose exec -T -e DB_DATABASE=movent_events_test event-service \
+            php vendor/bin/phpunit -c phpunit.pgsql.xml --filter test_deux_holds --display-warnings --display-deprecations 2>&1 | tee -a /tmp/pgsql-test.log
 
       - name: Tests PHPUnit — booking-service
         run: docker compose exec -T booking-service php artisan test
