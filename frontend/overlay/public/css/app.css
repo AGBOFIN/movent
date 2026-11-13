@@ -1,28 +1,28 @@
 /* ==========================================================================
-   MOVENT — Design system (thème sombre)
+   MOVENT — Design system (thème clair portail officiel)
    ========================================================================== */
 :root{
-  /* surfaces & texte */
-  --bg:#020617; --bg-a:#020617dd; --card:#0E1223; --surface:#1A1E2F; --surface-2:#232A44; --border:#334155; --border-strong:#475569;
-  --ink:#F8FAFC; --ink2:#94A3B8; --ink3:#64748B;
-  /* actions */
-  --accent:#16A34A; --accent-2:#22C55E; --accent-ink:#0F172A; --accent-a:#16A34A55; --accent-ring:#16A34A33;
-  /* sémantique */
-  --danger:#DC2626; --danger-2:#EF4444; --danger-text:#F87171; --danger-bg:#2a0f0f; --danger-bd:#991B1B;
-  --ok-text:#4ADE80; --ok-bg:#052e16; --ok-bd:#166534; --ok-bg2:#BBF7D0;
-  --warn:#D97706; --warn-text:#FBBF24; --warn-bg:#451a03; --warn-bd:#92400E; --warn-text2:#FDE68A; --warn-bg2:#2d1a04;
-  --info-text:#BFDBFE; --info-bg:#0c1a2e; --info-bd:#1E40AF; --info-text2:#93C5FD; --info-bg2:#172554;
-  --st-private-bg:#1A1E2F; --st-private-bd:#334155;
-  --on-solid:#FFFFFF; --alert-danger-text:#FECACA; --row-hover:#131a30;
+  /* surfaces & texte — thème clair « portail officiel » */
+  --bg:#EDF2F4; --bg-a:rgba(8,24,30,.55); --card:#FFFFFF; --surface:#E7EEF0; --surface-2:#DCE7EA; --border:#D3E0E3; --border-strong:#B7CACE;
+  --ink:#1A202C; --ink2:#4A5A63; --ink3:#7A8B93;
+  /* actions — sarcelle & or du drapeau togolais */
+  --accent:#0E5B5C; --accent-2:#0F6E6F; --accent-ink:#FFFFFF; --accent-a:rgba(14,91,92,.14); --accent-ring:rgba(14,91,92,.18);
+  /* sémantique (teintes claires) */
+  --danger:#C8102E; --danger-2:#A50D24; --danger-text:#B42318; --danger-bg:#FDECEA; --danger-bd:#F3C9C9;
+  --ok-text:#1E7B34; --ok-bg:#E3F3E7; --ok-bd:#BFE3C9; --ok-bg2:#1E7B34;
+  --warn:#B45309; --warn-text:#8A5A00; --warn-bg:#FBF0DA; --warn-bd:#EBD3A8; --warn-text2:#6E4A00; --warn-bg2:#F8EFD9;
+  --info-text:#0F5B66; --info-bg:#E4F0F1; --info-bd:#BFDDE0; --info-text2:#0F5B66; --info-bg2:#DDECEF;
+  --st-private-bg:#EEF1F4; --st-private-bd:#CBD6DA;
+  --on-solid:#FFFFFF; --alert-danger-text:#8F1D1D; --row-hover:#F0F6F7;
   --g1:linear-gradient(150deg,#14532d,#052e16); --g2:linear-gradient(150deg,#78350f,#1c0f04);
   --g3:linear-gradient(150deg,#0c4a6e,#082f49); --g4:linear-gradient(150deg,#4d7c0f,#1a2e05);
   --g5:linear-gradient(150deg,#7c2d12,#2a0f04); --g6:linear-gradient(150deg,#1e3a8a,#0f1c46);
-  --st-draft-bg:#1A1E2F;
+  --st-draft-bg:#EEF1F4;
   /* géométrie & motion */
   --r:14px; --r-sm:10px;
   --font:'Inter',system-ui,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,monospace;
-  --shadow:0 8px 30px rgba(2,6,23,.55);
+  --shadow:0 10px 34px rgba(20,50,58,.12);
   --tr:.2s ease;
 }
 *{box-sizing:border-box}
@@ -34,7 +34,7 @@ a{color:var(--accent)}
 ::selection{background:var(--accent-a)}
 
 /* ---------- structure ---------- */
-.top{background:rgba(2,6,23,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 5vw;min-height:64px;position:sticky;top:0;z-index:50}
+.top{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 5vw;min-height:64px;position:sticky;top:0;z-index:50}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand img{height:34px;width:auto;display:block}
 .top nav.desk{display:flex;gap:6px;align-items:center}
@@ -183,7 +183,7 @@ td select{min-height:38px;padding:6px 10px;font-size:13px;width:auto}
 @media(max-width:560px){.ticket{flex-direction:column}.ticket .stub{flex:none;flex-direction:row;border-right:0;border-bottom:2px dashed var(--border);padding:12px}.ticket .perf-top,.ticket .perf-bot{display:none}}
 
 /* ---------- modale ---------- */
-.modal{position:fixed;inset:0;background:rgba(2,6,23,.78);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:100;padding:16px}
+.modal{position:fixed;inset:0;background:rgba(20,40,50,.45);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:100;padding:16px}
 .modal .box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;max-width:540px;width:100%;max-height:90vh;overflow:auto;display:grid;gap:16px;box-shadow:var(--shadow);position:relative}
 .modal .box h2{margin:0;font-size:22px}
 .modal .close{position:absolute;top:14px;right:14px}

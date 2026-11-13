@@ -56,7 +56,7 @@
         <div class="dropdown" id="dd" hidden><a href="${HOME[u.role] || '/'}">${esc(SPACE[u.role] || 'Mon espace')}</a><a href="#" class="js-lo">Déconnexion</a></div></div>`
       : `<a href="/login">Connexion</a><a class="btn sm" href="/register">Inscription</a>`;
     const links = `<a href="/events">Événements</a><a href="/lieux">Lieux</a>${menu}`;
-    $('#nav').innerHTML = `<a class="brand" href="/"><img src="/img/logo.svg" alt="MOVENT — Discover. Book. Experience."></a>` +
+    $('#nav').innerHTML = `<a class="brand" href="/"><img src="/img/logo-light.svg" alt="MOVENT — Discover. Book. Experience."></a>` +
       `<button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mnav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>` +
       `<nav class="desk">${links}</nav><nav class="mnav" id="mnav">${links}</nav>`;
     const burger = $('#burger'), mnav = $('#mnav');
