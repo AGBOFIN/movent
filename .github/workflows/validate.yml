@@ -88,11 +88,11 @@ jobs:
         run: docker compose -f docker-compose.prod.yml logs caddy | tail -40
 
       - name: Publier le diagnostic PHPUnit en commentaire de commit
-        if: failure() && hashFiles('/tmp/pgsql-test.log') != ''
+        if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          { echo "### CI — test de concurrence pgsql"; echo '```'; tail -80 /tmp/pgsql-test.log; echo '```'; } > /tmp/comment.md
+          { echo "### CI — test de concurrence pgsql"; echo '```'; if [ -f /tmp/pgsql-test.log ]; then tail -80 /tmp/pgsql-test.log; else echo "(log absent)"; fi; echo '```'; } > /tmp/comment.md
           jq -n --rawfile body /tmp/comment.md '{body: $body}' \
             | gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" --input -
 
