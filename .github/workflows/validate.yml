@@ -45,9 +45,11 @@ jobs:
 
       - name: Tests de concurrence sur PostgreSQL réel (anti-survente)
         run: |
-          docker compose exec -T event-db psql -U movent -d postgres -c "DROP DATABASE IF EXISTS movent_events_test" -c "CREATE DATABASE movent_events_test"
+          # Base de test dédiée et jetable (movent_events_test).
+          # createdb échoue si elle existe déjà : sans gravité, migrate:fresh la nettoie.
+          docker compose exec -T event-db createdb -U movent movent_events_test || true
           docker compose exec -T -e DB_DATABASE=movent_events_test event-service \
-            php vendor/bin/phpunit -c phpunit.pgsql.xml --filter test_deux_holds_simultanes_dernieres_places_un_seul_reussit
+            php vendor/bin/phpunit -c phpunit.pgsql.xml --filter test_deux_holds --display-warnings --display-deprecations
 
       - name: Tests PHPUnit — booking-service
         run: docker compose exec -T booking-service php artisan test
