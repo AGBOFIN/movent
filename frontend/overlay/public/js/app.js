@@ -110,7 +110,12 @@
       m.querySelectorAll('button').forEach((x) => (x.disabled = true));
       try {
         const r = await api(`/bookings/${b.id}/pay`, { method: 'POST', body: { outcome: btn.dataset.o } });
-        toast(r.status === 'CONFIRMED' ? 'Paiement réussi, vos billets sont prêts !' : 'Paiement échoué : places libérées.', r.status === 'CONFIRMED');
+        if (r.status === 'CONFIRMED') {
+          m.close();
+          location.href = '/paiement-reussi?ref=' + encodeURIComponent(b.reference || '');
+          return;
+        }
+        toast('Paiement échoué : places libérées.', false);
       } catch (err) { toast(err.message, false); }
       m.close(); done && done();
     };
@@ -173,7 +178,7 @@
       btn.disabled = true;
       try {
         const b = await api('/bookings', { method: 'POST', body: { event_id: e.id, quantity: Number($('#qty').value) } });
-        if (b.status === 'CONFIRMED') { toast('Réservation confirmée ! Vos billets sont dans votre espace.'); setTimeout(() => (location.href = '/account'), 1200); }
+        if (b.status === 'CONFIRMED') { location.href = '/paiement-reussi?ref=' + encodeURIComponent(b.reference || ''); }
         else payModal(b, () => (location.href = '/account#tickets'));
       } catch (err) { toast(err.message, false); btn.disabled = false; }
     };

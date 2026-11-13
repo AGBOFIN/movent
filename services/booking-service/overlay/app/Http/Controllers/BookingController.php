@@ -30,6 +30,9 @@ class BookingController extends Controller
 
     private function makeTickets(Booking $b): void
     {
+        if (Ticket::where('booking_id', $b->id)->exists()) {
+            return; // idempotent : jamais de billets en double
+        }
         for ($i = 1; $i <= $b->quantity; $i++) {
             Ticket::create([
                 'booking_id' => $b->id,
@@ -112,46 +115,47 @@ class BookingController extends Controller
     public function pay(Request $r, string $id)
     {
         $d = $r->validate(['outcome' => 'required|in:success,failed']);
-        $b = $this->mine($r, $id);
-        abort_unless($b->status === 'PENDING', 409, 'Cette réservation n\'est plus en attente de paiement.');
         $ref = 'SIM-'.strtoupper(Str::random(10));
 
-        if ($d['outcome'] === 'success') {
-            $c = $this->internal()->post($this->ev('/api/events/'.$b->event_id.'/confirm-hold'), ['booking_id' => $b->id]);
-            if (in_array($c->status(), [404, 410], true)) {
-                DB::transaction(function () use ($b, $ref) {
+        // Verrou de ligne : deux paiements simultanés sont sérialisés,
+        // le second voit CONFIRMED/FAILED et est refusé (pas de double billet).
+        return DB::transaction(function () use ($r, $id, $d, $ref) {
+            $b = Booking::where('participant_id', $r->attributes->get('auth')['id'])
+                ->lockForUpdate()->findOrFail($id);
+            abort_unless($b->status === 'PENDING', 409, 'Cette réservation n\'est plus en attente de paiement.');
+
+            if ($d['outcome'] === 'success') {
+                $c = $this->internal()->post($this->ev('/api/events/'.$b->event_id.'/confirm-hold'), ['booking_id' => $b->id]);
+                if (in_array($c->status(), [404, 410], true)) {
                     Payment::create(['booking_id' => $b->id, 'amount' => $b->total_amount, 'method' => 'SIMULATED', 'status' => 'FAILED', 'transaction_reference' => $ref]);
                     $b->update(['status' => 'EXPIRED']);
-                });
-                return response()->json(['message' => 'Le délai de paiement est dépassé : les places ont été libérées.'], 410);
-            }
-            if (! $c->successful()) {
-                return response()->json(['message' => 'Confirmation impossible, réessayez.'], 502);
-            }
-            DB::transaction(function () use ($b, $ref) {
+                    return response()->json(['message' => 'Le délai de paiement est dépassé : les places ont été libérées.'], 410);
+                }
+                if (! $c->successful()) {
+                    return response()->json(['message' => 'Confirmation impossible, réessayez.'], 502);
+                }
                 Payment::create(['booking_id' => $b->id, 'amount' => $b->total_amount, 'method' => 'SIMULATED', 'status' => 'SUCCESS', 'transaction_reference' => $ref]);
                 $b->update(['status' => 'CONFIRMED']);
                 $this->makeTickets($b);
-            });
-        } else {
-            $this->internal()->post($this->ev('/api/events/'.$b->event_id.'/release-hold'), ['booking_id' => $b->id]);
-            DB::transaction(function () use ($b, $ref) {
+            } else {
+                $this->internal()->post($this->ev('/api/events/'.$b->event_id.'/release-hold'), ['booking_id' => $b->id]);
                 Payment::create(['booking_id' => $b->id, 'amount' => $b->total_amount, 'method' => 'SIMULATED', 'status' => 'FAILED', 'transaction_reference' => $ref]);
                 $b->update(['status' => 'FAILED']);
-            });
-        }
-        return $this->mine($r, $id);
+            }
+            return $this->mine($r, $id);
+        });
     }
 
     public function cancel(Request $r, string $id)
     {
-        $b = $this->mine($r, $id);
-        abort_unless(in_array($b->status, ['PENDING', 'CONFIRMED'], true), 409, 'Cette réservation ne peut pas être annulée.');
-        $this->internal()->post($this->ev('/api/events/'.$b->event_id.'/release-hold'), ['booking_id' => $b->id]);
-        DB::transaction(function () use ($b) {
+        return DB::transaction(function () use ($r, $id) {
+            $b = Booking::where('participant_id', $r->attributes->get('auth')['id'])
+                ->lockForUpdate()->findOrFail($id);
+            abort_unless(in_array($b->status, ['PENDING', 'CONFIRMED'], true), 409, 'Cette réservation ne peut pas être annulée.');
+            $this->internal()->post($this->ev('/api/events/'.$b->event_id.'/release-hold'), ['booking_id' => $b->id]);
             $b->update(['status' => 'CANCELLED']);
             Ticket::where('booking_id', $b->id)->update(['status' => 'CANCELLED']);
+            return $this->mine($r, $id);
         });
-        return $this->mine($r, $id);
     }
 }

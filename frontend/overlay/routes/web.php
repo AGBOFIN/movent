@@ -13,6 +13,7 @@ Route::view('/account', 'account');
 Route::view('/organizer', 'organizer');
 Route::view('/admin', 'admin');
 Route::view('/supervision', 'supervision');
+Route::view('/paiement-reussi', 'payment-success');
 
 Route::view('/a-propos', 'pages.a-propos');
 Route::view('/contact', 'pages.contact');
