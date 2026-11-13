@@ -10,6 +10,27 @@
   var when = function (d) { return d ? new Date(d).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; };
   var api = function (p) { return fetch('/api' + p, { headers: { Accept: 'application/json' } }).then(function (r) { return r.json(); }); };
 
+  /* ---------- révélations au scroll ---------- */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+  }
+
+  /* ---------- statistiques réelles ---------- */
+  function setCount(key, val) {
+    document.querySelectorAll('[data-count="' + key + '"]').forEach(function (el) { el.textContent = val; });
+  }
+  api('/events?per_page=1').then(function (d) { if (d && d.total != null) setCount('events', d.total); }).catch(function () {});
+  api('/venues').then(function (list) {
+    var n = Array.isArray(list) ? list.length : 0;
+    setCount('venues', n);
+    api('/venues/cities').then(function (cities) { setCount('cities', Array.isArray(cities) ? cities.length : 0); }).catch(function () {});
+  }).catch(function () {});
+
   /* ---------- catalogue d'événements ---------- */
   var grid = $('#grid'), more = $('#more'), q = $('#q'), kind = $('#kind'), free = $('#free');
   var catId = '', page = 1, lastPage = 1;
